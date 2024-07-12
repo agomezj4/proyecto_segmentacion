@@ -1,0 +1,22 @@
+## Primary parameters
+
+id_cliente:
+  - id_cliente
+
+campos_recategorizacion:
+  canal_agrupacion:
+    - "(Other)": "Other"
+  navegador_dispositivo:
+    - "Safari (in-app)": "Safari App"
+  categoria_dispositivo:
+    - "desktop": "Desktop"
+    - "mobile": "Mobile"
+    - "tablet": "Tablet"
+  medio_trafico:
+    - "referral": "Referral"
+    - "organic": "Organic"
+    - "cpm": "CPM"
+    - "cpc": "CPC"
+    - "affiliate": "Affiliate"
+    - "(none)": ""
+    - "(not set)": ""
