@@ -1,16 +1,17 @@
 from typing import Dict, Any
 
 import pandas as pd
-import unicodedata
 import logging
 
 logging.basicConfig()
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
-class pipelie_primary:
+
+class PipelinePrimary:
 
     # 1. Recategorizar columnas
+    @staticmethod
     def recategorize_pd(df: pd.DataFrame, params: Dict[str, Any]) -> pd.DataFrame:
         """
         Recategoriza los valores de las columnas especificadas en un DataFrame basado en
@@ -46,6 +47,7 @@ class pipelie_primary:
         return df
 
     #2. Impurtar datos faltantes
+    @staticmethod
     def impute_missing_values_pd(df: pd.DataFrame, params: Dict[str, Any]) -> pd.DataFrame:
         """
         Imputa los valores faltantes en un DataFrame de Pandas basado en el tipo de cada columna
@@ -66,7 +68,7 @@ class pipelie_primary:
         logger.info("Iniciando el proceso de imputación de valores faltantes...")
 
         # Obtener el nombre del campo de ID desde los parámetros
-        id_field = params['id_cliente']
+        id_field = params['id_cliente'][0]
 
         # Identificar columnas con valores nulos, excluyendo el campo de ID
         columns_with_nulls = [
@@ -112,64 +114,57 @@ class pipelie_primary:
             logger.warning(f"Se encontraron valores nulos en el campo de ID '{id_field}'.")
 
             # Recomendación técnica: eliminar registros con ID nulo
-            df = df.dropna(subset=[id_field])
-            logger.info(f"Registros con valores nulos en el campo de ID '{id_field}' han sido eliminados.")
+            df_clean = df.dropna(subset=[id_field])
+        else:
+            df_clean = df
 
         logger.info("Imputación de valores faltantes completada!")
-        return df
+        return df_clean
 
     # 3. Eliminar clientes con id duplicado
+    @staticmethod
     def remove_duplicates_pd(df: pd.DataFrame, params: Dict[str, Any]) -> pd.DataFrame:
         """
-        Elimina duplicados en el DataFrame basado en el campo de ID especificado en los parámetros,
-        quedándose con el último registro para cada ID duplicado.
+        Elimina duplicados en el DataFrame basado en la combinación de los campos 'id_cliente' y 'id_sesion',
+        quedándose con el último registro para cada combinación duplicada.
 
         Parameters
         ----------
         df : pd.DataFrame
             DataFrame de entrada del cual se removerán los duplicados.
         params : Dict[str, Any]
-            Parámetros primary.
+            Parámetros primary que incluyen 'id_cliente' e 'id_sesion'.
 
         Returns
         -------
-        pd.DataFrame: DataFrame sin duplicados en el campo de ID.
+        pd.DataFrame: DataFrame sin duplicados en la combinación de 'id_cliente' e 'id_sesion'.
         """
         logger.info("Iniciando el proceso de eliminación de duplicados...")
 
-        # Obtener el nombre del campo de ID desde los parámetros
-        id_field = params['id_cliente']
+        # Obtener los nombres de los campos de ID desde los parámetros
+        id_cliente = params['id_cliente'][0]
+        id_sesion = params['id_sesion'][0]
 
-        # Asegurarse de que id_field es una cadena
-        if isinstance(id_field, list):
-            if len(id_field) == 1:
-                id_field = id_field[0]
-            else:
-                logger.error("El parámetro 'id_cliente' contiene más de un campo.")
-                raise ValueError("El parámetro 'id_cliente' debe contener solo un campo de ID.")
-
-        if id_field not in df.columns:
-            logger.error(f"El campo de ID '{id_field}' no se encuentra en el DataFrame.")
-            raise ValueError(f"El campo de ID '{id_field}' no se encuentra en el DataFrame.")
-
-        # Verificar si hay duplicados en el campo de ID
-        has_duplicates = df.duplicated(subset=[id_field]).any()
+        # Verificar si hay duplicados en la combinación de los campos de ID
+        has_duplicates = df.duplicated(subset=[id_cliente, id_sesion]).any()
 
         if has_duplicates:
             logger.info(
-                f"Se encontraron duplicados en el campo de ID '{id_field}'. Eliminando duplicados y conservando el último registro...")
+                f"Se encontraron duplicados en la combinación de los campos de ID '{id_cliente}' y '{id_sesion}'. "
+                f"Eliminando duplicados y conservando el último registro...")
 
             # Eliminar duplicados y conservar el último registro
-            df_clean = df.drop_duplicates(subset=[id_field], keep='last')
+            df_clean = df.drop_duplicates(subset=[id_cliente, id_sesion], keep='last')
             logger.info(f"Duplicados eliminados. Total de registros después de la eliminación: {len(df_clean)}")
         else:
-            logger.info(f"No se encontraron duplicados en el campo '{id_field}'.")
+            logger.info(f"No se encontraron duplicados en la combinación de los campos '{id_cliente}' y '{id_sesion}'.")
             df_clean = df
 
-        logger.info("Fanaliza la verificación de duplicados!")
+        logger.info("Finaliza la verificación de duplicados!")
         return df_clean
 
     # 4. Remover outliers
+    @staticmethod
     def remove_outliers_pd(df: pd.DataFrame) -> pd.DataFrame:
         """
         Remueve outliers de un DataFrame en múltiples columnas numéricas (float64 e int64)
@@ -194,13 +189,13 @@ class pipelie_primary:
 
         for column_name in numeric_columns:
             # Calcular el primer y tercer cuartil (Q1 y Q3)
-            Q1 = df_clean[column_name].quantile(0.25)
-            Q3 = df_clean[column_name].quantile(0.75)
-            IQR = Q3 - Q1
+            q1 = df_clean[column_name].quantile(0.25)
+            q3 = df_clean[column_name].quantile(0.75)
+            iqr = q3 - q1
 
             # Determinar los límites inferior y superior para identificar outliers
-            lower_bound = Q1 - 1.5 * IQR
-            upper_bound = Q3 + 1.5 * IQR
+            lower_bound = q1 - 1.5 * iqr
+            upper_bound = q3 + 1.5 * iqr
 
             # Verificar si existen outliers en la columna
             has_outliers = df_clean[
@@ -215,3 +210,4 @@ class pipelie_primary:
 
         logger.info("Eliminación de outliers completada.")
         return df_clean
+

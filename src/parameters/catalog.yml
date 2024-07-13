@@ -1,10 +1,10 @@
 ## Data paths parameters
-tag_dict_path: tag_dict_tc.xlsx
+tag_dict_path: tag_dict_segmentacion.xlsx
 
 data_customers_path: data_customers.csv
 
-raw_data_path: raw_data.csv
+raw_data_path: raw_data.parquet
 
-intermediate_data_path: intermediate_data.csv
+intermediate_data_path: intermediate_data.parquet
 
-primary_data_path: primary_data.csv
+primary_data_path: primary_data.parquet

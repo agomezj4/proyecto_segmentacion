@@ -1,0 +1,12 @@
+data_features:
+ hora_visita: hora_visita
+ bins_hora: [0, 6, 12, 18, 24]
+ labels_hora: ['Madrugada', 'Mañana', 'Tarde', 'Noche']
+ interacciones_sesion: interacciones_sesion
+ pag_vistas_sesion: pag_vistas_sesion
+ canal_agrupacion: canal_agrupacion
+ medio_trafico: medio_trafico
+ tasa_rebote: tasa_rebote
+ tasa_visitas_fds: tasa_visitas_fds
+ id_cliente: id_cliente
+ id_sesion: id_sesion
