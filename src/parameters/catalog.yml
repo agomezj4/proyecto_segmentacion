@@ -8,3 +8,5 @@ raw_data_path: raw_data.parquet
 intermediate_data_path: intermediate_data.parquet
 
 primary_data_path: primary_data.parquet
+
+feature_data_path: feature_data.parquet

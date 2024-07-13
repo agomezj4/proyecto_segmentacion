@@ -12,7 +12,7 @@ class PipelineFeature:
 
     # 1. Creación nuevas características
     @staticmethod
-    def features_new(
+    def features_new_pd(
             df: pd.DataFrame,
             params: Dict[str, Any]
     ) -> pd.DataFrame:
@@ -60,3 +60,44 @@ class PipelineFeature:
 
         logger.info("Finalizado el cálculo de nuevas características.")
         return df
+
+    # 2. Escalado de variables numéricos
+    @staticmethod
+    def min_max_scaler_pd(df: pd.DataFrame) -> pd.DataFrame:
+        """
+        Estandariza las columnas numéricas (excluyendo binarias) de un DataFrame utilizando el método Min-Max Scaler.
+
+        Parameters
+        ----------
+        df : pd.DataFrame
+            DataFrame de Pandas que se estandarizará.
+
+        Returns
+        -------
+        pd.DataFrame
+            DataFrame estandarizado.
+        """
+        logger.info("Iniciando la estandarización con Min-Max Scaler...")
+
+        # Identificar las columnas numéricas
+        numeric_cols = df.select_dtypes(include=['float32', 'float64', 'int32', 'int64']).columns
+
+        # Filtrar solo las columnas numéricas no binarias (excluyendo aquellas que solo toman valores 0 y 1)
+        numeric_cols = [col for col in numeric_cols if
+                        not ((df[col].nunique() == 2) & (df[col].isin([0, 1]).sum() == len(df)))]
+
+        # Crear una copia del DataFrame para evitar el SettingWithCopyWarning
+        df_copy = df.copy()
+
+        # Aplicar Min-Max Scaler solo a las columnas numéricas no binarias
+        for col in numeric_cols:
+            min_val = df_copy[col].min()
+            max_val = df_copy[col].max()
+            range_val = max_val - min_val
+            if range_val != 0:  # Evita la división por cero en caso de que todas las entradas en una columna sean iguales
+                df_copy[col] = df_copy[col].astype('float64')  # Convertir la columna a float64
+                df_copy.loc[:, col] = (df_copy[col] - min_val) / range_val
+
+        logger.info("Estandarización con Min-Max Scaler completada!")
+
+        return df_copy

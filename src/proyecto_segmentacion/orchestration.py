@@ -2,6 +2,8 @@ import os
 from .utils import Utils
 from .pipelines.raw import PipelineRaw
 from .pipelines.intermediate import PipelineIntermediate
+from .pipelines.primary import PipelinePrimary
+from .pipelines.feature import PipelineFeature
 
 logger = Utils.setup_logging()
 Utils.add_src_to_path()
@@ -10,6 +12,8 @@ project_root = Utils.get_project_root()
 parameters_directory = os.path.join(project_root, 'src', 'parameters')
 data_raw_directory = os.path.join(project_root, 'data', '01_raw')
 data_intermediate_directory = os.path.join(project_root, 'data', '02_intermediate')
+data_primary_directory = os.path.join(project_root, 'data', '03_primary')
+data_feature_directory = os.path.join(project_root, 'data', '04_feature')
 
 parameters = Utils.load_parameters(parameters_directory)
 
@@ -48,6 +52,54 @@ class PipelineOrchestration:
             data_intermediate_directory,
             parameters['parameters_catalog']['intermediate_data_path'])
         Utils.save_data(data_intermediate, intermediate_data_path)
+
+    # 3. Pipeline Primary
+    @staticmethod
+    def run_pipeline_primary():
+        intermediate_data_path = os.path.join(
+            data_intermediate_directory,
+            parameters['parameters_catalog']['intermediate_data_path'])
+
+        data_intermediate = Utils.load_data(intermediate_data_path)
+
+        data_categorize = PipelinePrimary.recategorize_pd(
+            data_intermediate,
+            parameters['parameters_primary'])
+
+        data_impute_missing = PipelinePrimary.impute_missing_values_pd(
+            data_categorize,
+            parameters['parameters_primary'])
+
+        data_remove_duplicates = PipelinePrimary.remove_duplicates_pd(
+            data_impute_missing,
+            parameters['parameters_primary'])
+
+        data_primary = PipelinePrimary.remove_outliers_pd(data_remove_duplicates)
+
+        primary_data_path = os.path.join(
+            data_primary_directory,
+            parameters['parameters_catalog']['primary_data_path'])
+        Utils.save_data(data_primary, primary_data_path)
+
+    # 4. Pipeline Feature
+    @staticmethod
+    def run_pipeline_feature():
+        primary_data_path = os.path.join(
+            data_primary_directory,
+            parameters['parameters_catalog']['primary_data_path'])
+
+        data_primary = Utils.load_data(primary_data_path)
+
+        data_features_new = PipelineFeature.features_new_pd(
+            data_primary,
+            parameters['parameters_feature'])
+
+        data_feature = PipelineFeature.min_max_scaler_pd(data_features_new)
+
+        feature_data_path = os.path.join(
+            data_feature_directory,
+            parameters['parameters_catalog']['feature_data_path'])
+        Utils.save_data(data_feature, feature_data_path)
 
 
 
