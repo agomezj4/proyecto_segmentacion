@@ -8,9 +8,11 @@ logging.basicConfig()
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
-class pipelie_intermediate:
+
+class PipelineIntermediate:
 
     # 1. Re- nombrar
+    @staticmethod
     def change_names_pd(df: pd.DataFrame, tag_dict: pd.DataFrame) -> pd.DataFrame:
         """
         Cambia los nombres de las columnas de un DataFrame según un tag dictionary y devuelve
@@ -36,13 +38,14 @@ class pipelie_intermediate:
         col_mapping = dict(zip(tag_dict_filtered['tag'], tag_dict_filtered['name']))
 
         # Cambia los nombres de las columnas según el tag dictionary "raw"
-        df = df.rename(columns=col_mapping)
+        data = df.rename(columns=col_mapping)
 
         logger.info("Nombres de columnas cambiados!")
 
-        return df
+        return data
 
     # 2. Cambiar tipos de datos
+    @staticmethod
     def change_dtype_pd(df: pd.DataFrame, tag_dict: pd.DataFrame) -> pd.DataFrame:
         """
         Cambia el tipo de datos de cada columna en un DataFrame al tipo de datos especificado
@@ -72,7 +75,19 @@ class pipelie_intermediate:
             if col in type_mapping:
                 try:
                     new_type = type_mapping[col]
-                    df[col] = df[col].astype(new_type)
+                    if new_type == 'object':
+                        df[col] = df[col].astype(str)
+                    elif new_type == 'bool':
+                        df[col] = df[col].astype(bool)
+                    elif new_type == 'float64':
+                        df[col] = df[col].astype(float)
+                    elif new_type == 'int64':
+                        df[col] = df[col].astype(int)
+                    elif new_type == 'uint64':
+                        df[col] = df[col].astype('uint64')
+                    else:
+                        df[col] = df[col].astype(new_type)
+                    logger.info(f"Columna {col} cambiada a {new_type}")
                 except Exception as e:
                     logger.error(f"Error al intentar castear la columna {col} a {new_type}: {e}")
 
@@ -81,6 +96,7 @@ class pipelie_intermediate:
         return df
 
     # 3. Eliminar acentos
+    @staticmethod
     def delete_accents_pd(df: pd.DataFrame) -> pd.DataFrame:
         """
         Elimina los acentos de las columnas identificadas como "str" de un DataFrame de Pandas.
@@ -109,3 +125,4 @@ class pipelie_intermediate:
         logger.info("Acentos eliminados!")
 
         return df
+

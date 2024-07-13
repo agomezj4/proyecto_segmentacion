@@ -1012,7 +1012,7 @@ fullVisitorId,channelGrouping,weekend_prop,hour,sessionId,device.browser,device.
 453417896500580053,Referral,0.0,18.0,4,Chrome,desktop,0.0,Linux,10.0,8.0,0.0,referral
 454845221896711463,Referral,0.0,16.5,4,Chrome,desktop,0.0,Macintosh,13.0,10.0,0.0,referral
 455277019106287876,Organic Search,0.0,19.0,1,Chrome,desktop,0.0,Macintosh,58.0,42.0,0.0,organic
-455718321769006834,Organic Search,0.0,2.0,2,Chrome,desktop,0.5,Android,41.5,33.0,0.5,organic
+455718321769006834,Organic Search,0.0,2.0,2,Chrome,desktop,0.0,Android,41.5,33.0,0.5,organic
 456585804826434876,Organic Search,1.0,11.0,2,Chrome,mobile,1.0,Android,9.0,7.5,0.0,organic
 456807427403774085,Referral,0.07692307692307693,18.0,13,Chrome,desktop,0.0,Macintosh,7.0,5.0,0.07692307692307693,referral
 456995923783583208,Organic Search,0.0,12.5,4,Chrome,desktop,0.0,Windows,8.5,7.5,0.0,organic
@@ -3967,7 +3967,7 @@ fullVisitorId,channelGrouping,weekend_prop,hour,sessionId,device.browser,device.
 3205462167547873078,Referral,0.5,19.5,2,Chrome,desktop,0.0,Macintosh,8.5,6.5,0.0,referral
 3205470611252051738,Organic Search,0.0,22.5,2,Chrome,desktop,0.0,Windows,45.0,30.5,0.0,organic
 3206053801824518527,Organic Search,0.0,15.0,1,Chrome,desktop,0.0,Macintosh,34.0,27.0,0.0,organic
-3207713058277296455,Direct,0.0,4.0,3,Chrome,mobile,0.6666666666666666,Android,51.0,42.0,0.0,(none)
+3207713058277296455,Direct,0.0,4.0,3,Chrome,mobile,1.0,Android,51.0,42.0,0.0,(none)
 3208324314042464006,Referral,0.4,19.0,5,Chrome,desktop,0.0,Macintosh,5.0,5.0,0.0,referral
 3209681780730962666,Organic Search,0.5,5.0,3,Chrome,mobile,1.0,Android,16.5,12.5,0.0,organic
 3210357805056492900,Referral,0.0,20.0,3,Chrome,desktop,0.0,Macintosh,3.0,3.0,0.0,referral
@@ -7700,7 +7700,7 @@ fullVisitorId,channelGrouping,weekend_prop,hour,sessionId,device.browser,device.
 7372141474604813858,Referral,0.0,12.5,2,Chrome,desktop,0.0,Macintosh,15.5,12.0,0.0,referral
 7376293826718831934,Referral,0.0,4.0,1,Chrome,desktop,0.0,Macintosh,19.0,17.0,0.0,referral
 7376304169676630885,Referral,0.0,17.0,1,Chrome,desktop,0.0,Macintosh,15.0,15.0,0.0,referral
-7376750587981554489,Organic Search,0.0,8.0,6,Chrome,mobile,0.8333333333333334,Android,2.5,2.5,0.5,organic
+7376750587981554489,Organic Search,0.0,8.0,6,Chrome,mobile,1.0,Android,2.5,2.5,0.5,organic
 7377189671853263468,Organic Search,0.0,17.0,5,Chrome,desktop,0.0,Windows,6.0,6.0,0.0,organic
 7378987659821753405,Referral,0.0,19.0,3,Chrome,desktop,0.0,Macintosh,4.0,4.0,0.3333333333333333,referral
 7379985924886898163,Referral,1.0,17.0,1,Chrome,desktop,0.0,Macintosh,163.0,112.0,0.0,referral
@@ -9707,7 +9707,7 @@ fullVisitorId,channelGrouping,weekend_prop,hour,sessionId,device.browser,device.
 9665457273951170213,Direct,0.0,18.5,2,Chrome,desktop,0.0,Macintosh,15.5,12.0,0.0,(none)
 9665573489181105578,Direct,0.0,21.5,4,Chrome,desktop,0.0,Macintosh,14.0,11.0,0.25,(none)
 9668596499730980627,Referral,0.0,1.0,1,Chrome,desktop,0.0,Macintosh,32.0,20.0,0.0,referral
-9669933764937008223,Organic Search,0.3076923076923077,16.0,13,Chrome,mobile,0.3076923076923077,Linux,1.0,1.0,0.5384615384615384,organic
+9669933764937008223,Organic Search,0.3076923076923077,16.0,13,Chrome,mobile,1.0,Linux,1.0,1.0,0.5384615384615384,organic
 9670996124580137796,Referral,0.0,1.0,4,Chrome,desktop,0.0,Macintosh,16.5,11.5,0.0,referral
 9671728324632392297,Referral,0.0,17.0,7,Chrome,desktop,0.0,Macintosh,8.0,6.0,0.2857142857142857,referral
 9672097680372886188,Referral,0.0,17.0,15,Chrome,desktop,0.0,Macintosh,5.0,5.0,0.06666666666666667,referral

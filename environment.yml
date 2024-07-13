@@ -15,3 +15,4 @@ dependencies:
   - pyyaml=6.0.0
   - scikit-learn=1.5.0
   - bayesian-optimization=1.4.3
+  - seaborn=0.13.2

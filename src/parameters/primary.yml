@@ -3,6 +3,9 @@
 id_cliente:
   - id_cliente
 
+id_sesion:
+  - id_sesion
+
 campos_recategorizacion:
   canal_agrupacion:
     - "(Other)": "Other"

@@ -8,9 +8,11 @@ logging.basicConfig()
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
-class pipelie_raw:
+
+class PipelineRaw:
 
     # 1. Validar tag de las fuentes
+    @staticmethod
     def validate_tags_pd(df: pd.DataFrame, tag_dict: pd.DataFrame) -> pd.DataFrame:
         """
         Valida que el número de tags identificados en source como raw sea igual al
@@ -47,6 +49,7 @@ class pipelie_raw:
         return df
 
     # 2. Validar tipos de datos
+    @staticmethod
     def validate_dtypes_pd(df: pd.DataFrame, tag_dict: pd.DataFrame) -> pd.DataFrame:
         """
         Revisa que la tipología de los datos en el dataframe sea la misma estipulada
@@ -71,7 +74,8 @@ class pipelie_raw:
         # Filtra las filas del tag dictionary donde "source" es "raw"
         tag_dict_raw = tag_dict[tag_dict["source"] == "raw"]
 
-        # Crear un diccionario de los tipos de datos esperados para cada columna, normalizando a minúsculas y eliminando espacios
+        # Crear un diccionario de los tipos de datos esperados para cada columna,
+        # normalizando a minúsculas y eliminando espacios
         expected_types = {row['tag']: row['data_type'].strip().lower() for row in
                           tag_dict_raw.to_dict(orient='records')}
 
@@ -90,3 +94,4 @@ class pipelie_raw:
         logger.info("Tipos de datos validados correctamente!")
 
         return df
+
