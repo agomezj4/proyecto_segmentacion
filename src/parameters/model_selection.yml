@@ -7,10 +7,25 @@ DBSCAN:
     eps: [0.1, 10.0]  # Rango para eps
     min_samples: [1, 10]  # Rango para min_samples
     leaf_size: [20, 50]  # Rango para leaf_size
-    metric: ["euclidean", "minkowski"]  # Métrica para DBSCAN
-    algorithm: ["auto", "ball_tree", "kd_tree", "brute"]  # Algoritmo para DBSCAN
-    number_of_iterations: [50, 200]  # Número de iteraciones para la optimización bayesiana
+  metric: "euclidean"  # Métrica para DBSCAN
+  algorithm: "auto"  # Algoritmo para DBSCAN
+  number_of_iterations: 50  # Número de iteraciones para la optimización bayesiana
   init_points: 10  # Puntos iniciales para la optimización bayesiana
+
+Gaussian_Mixture_Model:
+  exploration_space:
+    n_components: [1, 8]  # Rango para el número de componentes
+    covariance_type: ["full", "tied", "diag", "spherical"]  # Tipos de covarianza
+    tol: [0.0001, 0.1]  # Rango para la tolerancia
+  max_iter: 100  # Número máximo de iteraciones
+  n_init: 10  # Número de inicializaciones
+  init_params: "kmeans"  # Método de inicialización
+  warm_start: False  # Si se debe usar warm start
+  verbose: 0  # Nivel de verbosidad
+  verbose_interval: 10  # Intervalo de verbosidad
+  number_of_iterations: 500  # Número de iteraciones para la optimización bayesiana
+  init_points: 10  # Puntos iniciales para la optimización bayesiana
+
 
 no_columns:
  - id_cliente

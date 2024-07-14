@@ -5,6 +5,7 @@ import logging
 import pandas as pd
 from scipy.stats import f_oneway, tukey_hsd
 from sklearn.cluster import DBSCAN
+from sklearn.mixture import GaussianMixture
 from sklearn.metrics import silhouette_score
 from bayes_opt import BayesianOptimization
 
@@ -167,36 +168,36 @@ class PipelineModelSelection:
 
     # 5. Optimiza los hiperparámetros del mejor modelo seleccionado
     @staticmethod
-    def optimize_train_best_model_pd(
+    def optimize_train_best_gmm_pd(
             df: pd.DataFrame,
             params: Dict[str, Any]
     ) -> Tuple[Any, float, pd.DataFrame]:
         """
-        Optimiza y entrena un modelo DBSCAN usando optimización bayesiana para
+        Optimiza y entrena un modelo Gaussian Mixture Model (GMM) usando optimización bayesiana para
         encontrar los mejores hiperparámetros basados en el coeficiente de silueta.
         Evalúa el modelo en el conjunto de datos proporcionado.
 
         Parameters
         ----------
         df : pd.DataFrame
-            DataFrame de entrada para el entrenamiento del modelo DBSCAN.
+            DataFrame de entrada para el entrenamiento del modelo GMM.
         params : Dict[str, Any]
-            Diccionario de parámetros para el modelo DBSCAN y exclusión de columnas.
+            Diccionario de parámetros para el modelo GMM y exclusión de columnas.
 
         Returns
         -------
         Tuple[Any, float, pd.DataFrame]
-            Mejor modelo DBSCAN entrenado, promedio de coeficientes de silueta y dataframe con los clusters asignados.
+            Mejor modelo GMM entrenado, promedio de coeficientes de silueta y dataframe con los clusters asignados.
         """
 
-        logger.info("Iniciando la optimización y el entrenamiento DBSCAN...")
+        logger.info("Iniciando la optimización y el entrenamiento GMM...")
 
         # Parámetros
-        dbscan_params = params['DBSCAN']
+        gmm_params = params['Gaussian_Mixture_Model']
         exclude_columns = params['no_columns']
         seed = params["random_state"]
-        exploration_space = dbscan_params["exploration_space"]
-        init_points = dbscan_params["init_points"]
+        exploration_space = gmm_params["exploration_space"]
+        init_points = gmm_params["init_points"]
 
         # Preparar los datos
         df, cliente_id = Utils.prepare_data(df, exclude_columns)
@@ -211,44 +212,134 @@ class PipelineModelSelection:
             else:
                 return -1
 
-        def dbscan_evaluate(eps, min_samples, leaf_size):
-            dbscan = DBSCAN(
-                eps=eps,
-                min_samples=int(min_samples),
-                metric=dbscan_params['metric'],
-                algorithm=dbscan_params['algorithm'],
-                leaf_size=int(leaf_size)
+        covariance_types = exploration_space['covariance_type']
+        exploration_space_mapped = {
+            'n_components': tuple(exploration_space['n_components']),
+            'covariance_type': (0, len(covariance_types) - 1),
+            'tol': tuple(exploration_space['tol'])
+        }
+
+        def gmm_evaluate(n_components, covariance_type, tol):
+            cov_type = covariance_types[int(covariance_type)]
+            gmm = GaussianMixture(
+                n_components=int(n_components),
+                covariance_type=cov_type,
+                tol=tol,
+                random_state=seed
             )
-            cluster_labels = dbscan.fit_predict(df)
+            cluster_labels = gmm.fit_predict(df)
             sil_score = calculate_silhouette_score(df, cluster_labels)
             return sil_score
 
         optimizer = BayesianOptimization(
-            f=dbscan_evaluate,
-            pbounds=exploration_space,
+            f=gmm_evaluate,
+            pbounds=exploration_space_mapped,
             random_state=seed,
             verbose=2
         )
-        optimizer.maximize(n_iter=dbscan_params['number_of_iterations'], init_points=init_points)
+        optimizer.maximize(n_iter=gmm_params['number_of_iterations'], init_points=init_points)
 
         best_params = optimizer.max["params"]
         best_score = optimizer.max["target"]
 
-        logger.info(f"Mejores parámetros DBSCAN: {best_params} con un coeficiente de silueta de {best_score}")
+        logger.info(f"Mejores parámetros GMM: {best_params} con un coeficiente de silueta de {best_score}")
 
-        best_dbscan = DBSCAN(
-            eps=best_params["eps"],
-            min_samples=int(best_params["min_samples"]),
-            metric=dbscan_params['metric'],
-            algorithm=dbscan_params['algorithm'],
-            leaf_size=int(best_params["leaf_size"])
+        best_gmm = GaussianMixture(
+            n_components=int(best_params["n_components"]),
+            covariance_type=covariance_types[int(best_params["covariance_type"])],
+            tol=best_params["tol"],
+            random_state=seed
         )
-        final_labels = best_dbscan.fit_predict(df)
+        final_labels = best_gmm.fit_predict(df)
         avg_sil_score = calculate_silhouette_score(df, final_labels)
 
         clusters_df = Utils.join_clusters(cliente_id, final_labels)
 
-        return best_dbscan, avg_sil_score, clusters_df
+        return best_gmm, avg_sil_score, clusters_df
+
+    # @staticmethod
+    # def optimize_train_best_dbscan_pd(
+    #         df: pd.DataFrame,
+    #         params: Dict[str, Any]
+    # ) -> Tuple[Any, float, pd.DataFrame]:
+    #     """
+    #     Optimiza y entrena un modelo DBSCAN usando optimización bayesiana para
+    #     encontrar los mejores hiperparámetros basados en el coeficiente de silueta.
+    #     Evalúa el modelo en el conjunto de datos proporcionado.
+    #
+    #     Parameters
+    #     ----------
+    #     df : pd.DataFrame
+    #         DataFrame de entrada para el entrenamiento del modelo DBSCAN.
+    #     params : Dict[str, Any]
+    #         Diccionario de parámetros para el modelo DBSCAN y exclusión de columnas.
+    #
+    #     Returns
+    #     -------
+    #     Tuple[Any, float, pd.DataFrame]
+    #         Mejor modelo DBSCAN entrenado, promedio de coeficientes de silueta y dataframe con los clusters asignados.
+    #     """
+    #
+    #     logger.info("Iniciando la optimización y el entrenamiento DBSCAN...")
+    #
+    #     # Parámetros
+    #     dbscan_params = params['DBSCAN']
+    #     exclude_columns = params['no_columns']
+    #     seed = params["random_state"]
+    #     exploration_space = dbscan_params["exploration_space"]
+    #     init_points = dbscan_params["init_points"]
+    #
+    #     # Preparar los datos
+    #     df, cliente_id = Utils.prepare_data(df, exclude_columns)
+    #
+    #     def calculate_silhouette_score(data, cluster_labels):
+    #         mask = cluster_labels != -1
+    #         filtered_data = data[mask]
+    #         filtered_labels = cluster_labels[mask]
+    #
+    #         if len(set(filtered_labels)) > 1:
+    #             return silhouette_score(filtered_data, filtered_labels)
+    #         else:
+    #             return -1
+    #
+    #     def dbscan_evaluate(eps, min_samples, leaf_size):
+    #         dbscan = DBSCAN(
+    #             eps=eps,
+    #             min_samples=int(min_samples),
+    #             metric=dbscan_params['metric'],
+    #             algorithm=dbscan_params['algorithm'],
+    #             leaf_size=int(leaf_size)
+    #         )
+    #         cluster_labels = dbscan.fit_predict(df)
+    #         sil_score = calculate_silhouette_score(df, cluster_labels)
+    #         return sil_score
+    #
+    #     optimizer = BayesianOptimization(
+    #         f=dbscan_evaluate,
+    #         pbounds=exploration_space,
+    #         random_state=seed,
+    #         verbose=2
+    #     )
+    #     optimizer.maximize(n_iter=dbscan_params['number_of_iterations'], init_points=init_points)
+    #
+    #     best_params = optimizer.max["params"]
+    #     best_score = optimizer.max["target"]
+    #
+    #     logger.info(f"Mejores parámetros DBSCAN: {best_params} con un coeficiente de silueta de {best_score}")
+    #
+    #     best_dbscan = DBSCAN(
+    #         eps=best_params["eps"],
+    #         min_samples=int(best_params["min_samples"]),
+    #         metric=dbscan_params['metric'],
+    #         algorithm=dbscan_params['algorithm'],
+    #         leaf_size=int(best_params["leaf_size"])
+    #     )
+    #     final_labels = best_dbscan.fit_predict(df)
+    #     avg_sil_score = calculate_silhouette_score(df, final_labels)
+    #
+    #     clusters_df = Utils.join_clusters(cliente_id, final_labels)
+    #
+    #     return best_dbscan, avg_sil_score, clusters_df
 
 
 
