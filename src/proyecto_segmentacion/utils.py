@@ -1,6 +1,7 @@
 import os
 import sys
 import yaml
+import pickle
 import pandas as pd
 
 class Utils:
@@ -53,3 +54,14 @@ class Utils:
             data.to_csv(path, index=False)
         else:
             raise ValueError("Formato de archivo no soportado. Use .csv o .parquet")
+
+    @staticmethod
+    def load_pickle(file_path):
+        with open(file_path, 'rb') as file:
+            data = pickle.load(file)
+        return data
+
+    @staticmethod
+    def save_pickle(data, file_path):
+        with open(file_path, 'wb') as file:
+            pickle.dump(data, file)
