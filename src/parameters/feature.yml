@@ -1,3 +1,5 @@
+## Feature parameters
+
 data_features:
  hora_visita: hora_visita
  bins_hora: [0, 6, 12, 18, 24]
@@ -10,3 +12,9 @@ data_features:
  tasa_visitas_fds: tasa_visitas_fds
  id_cliente: id_cliente
  id_sesion: id_sesion
+
+cum_cat: {
+    'no_cum_cat': ['id_cliente', 'id_sesion'],
+    'threshold': 0.75,
+    'value': 'Otro'
+}

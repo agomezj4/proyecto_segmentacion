@@ -33,9 +33,14 @@ class PipelinePrimary:
         # Parámetros
         campos_recategorizacion = params['campos_recategorizacion']
 
+        # Recorrer cada campo y sus recategorizaciones
         for campo, recategorizaciones in campos_recategorizacion.items():
+
+            # Verificar si el campo está presente en el DataFrame
             if campo in df.columns:
                 logger.info(f"Recategorizando el campo '{campo}'")
+
+                # Recorrer cada recategorización y reemplazar los valores
                 for recategorizacion in recategorizaciones:
                     for original, nuevo in recategorizacion.items():
                         df[campo] = df[campo].replace(original, nuevo)
