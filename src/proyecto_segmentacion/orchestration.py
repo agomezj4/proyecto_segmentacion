@@ -1,14 +1,15 @@
 import os
 from .utils import Utils
+
+logger = Utils.setup_logging()
+Utils.add_src_to_path()
+project_root = Utils.get_project_root()
+
 from .pipelines.raw import PipelineRaw
 from .pipelines.intermediate import PipelineIntermediate
 from .pipelines.primary import PipelinePrimary
 from .pipelines.feature import PipelineFeature
 from .pipelines.models import PipelineModels
-
-logger = Utils.setup_logging()
-Utils.add_src_to_path()
-project_root = Utils.get_project_root()
 
 parameters_directory = os.path.join(project_root, 'src', 'parameters')
 data_raw_directory = os.path.join(project_root, 'data', '01_raw')
@@ -118,15 +119,8 @@ class PipelineOrchestration:
         data_dbscan = PipelineModels.train_dbscan_pd(data_feature,
                                                      parameters['parameters_models'])
 
-        kmeans_data_path = os.path.join(data_models_directory,
-                                        parameters['parameters_catalog']['kmeans_model_data_path'])
-        Utils.save_pickle(data_kmeans, kmeans_data_path)
+        models_data_path = os.path.join(data_models_directory,
+                                        parameters['parameters_catalog']['models_data_path'])
 
-        gmm_data_path = os.path.join(data_models_directory,
-                                     parameters['parameters_catalog']['gmm_model_data_path'])
-        Utils.save_pickle(data_gmm, gmm_data_path)
-
-        dbscan_data_path = os.path.join(data_models_directory,
-                                        parameters['parameters_catalog']['dbscan_model_data_path'])
-        Utils.save_pickle(data_dbscan, dbscan_data_path)
+        Utils.save_pickle([data_kmeans, data_gmm, data_dbscan], models_data_path)
 

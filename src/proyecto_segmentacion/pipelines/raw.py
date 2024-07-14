@@ -1,7 +1,6 @@
 from typing import Dict, Any
 
 import pandas as pd
-import unicodedata
 import logging
 
 logging.basicConfig()

@@ -1,0 +1,19 @@
+# Model Selection parameters
+
+threshold_significance: 0.05
+
+DBSCAN:
+  exploration_space:
+    eps: [0.1, 10.0]  # Rango para eps
+    min_samples: [1, 10]  # Rango para min_samples
+    leaf_size: [20, 50]  # Rango para leaf_size
+    metric: ["euclidean", "minkowski"]  # Métrica para DBSCAN
+    algorithm: ["auto", "ball_tree", "kd_tree", "brute"]  # Algoritmo para DBSCAN
+    number_of_iterations: [50, 200]  # Número de iteraciones para la optimización bayesiana
+  init_points: 10  # Puntos iniciales para la optimización bayesiana
+
+no_columns:
+ - id_cliente
+ - id_sesion
+
+random_state: 42  # Semilla para la reproducibilidad

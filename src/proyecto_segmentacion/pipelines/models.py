@@ -1,11 +1,14 @@
-from typing import Dict, Any, Tuple
+from typing import Dict, Any, Tuple, List
+
 import pandas as pd
 import logging
 import numpy as np
 from sklearn.cluster import KMeans
 from sklearn.mixture import GaussianMixture
 from sklearn.cluster import DBSCAN
-from sklearn.metrics import silhouette_score
+from sklearn.metrics import silhouette_score, silhouette_samples
+
+from src.proyecto_segmentacion.utils import Utils
 
 logging.basicConfig()
 logger = logging.getLogger(__name__)
@@ -16,7 +19,7 @@ class PipelineModels:
 
     # 1. K-Means Clustering
     @staticmethod
-    def train_kmeans_pd(df: pd.DataFrame, params: Dict[str, Any]) -> Tuple[KMeans, float]:
+    def train_kmeans_pd(df: pd.DataFrame, params: Dict[str, Any]) -> Tuple[KMeans, List[float], pd.DataFrame]:
         """
         Entrena un modelo K-Means y determina el número óptimo de clusters utilizando el método del codo.
 
@@ -30,7 +33,7 @@ class PipelineModels:
         Returns
         -------
         Tuple[KMeans, float]
-            Modelo K-Means entrenado y el puntaje de coeficiente de silueta.
+            Modelo K-Means entrenado, lista puntajes de coeficiente de silueta y dataframe con los clusters asignados.
         """
         logger.info("Iniciando el proceso de entrenamiento K-Means...")
 
@@ -38,8 +41,8 @@ class PipelineModels:
         k_means_params = params['K_Means']
         exclude_columns = params['no_columns']
 
-        # Excluir columnas no relevantes
-        df = df.drop(columns=exclude_columns)
+        # Preparar los datos
+        df, cliente_id = Utils.prepare_data(df, exclude_columns)
 
         # Verificar que el rango de k sea adecuado
         k_range = list(range(k_means_params['k_range'][0], k_means_params['k_range'][1] + 1))
@@ -81,7 +84,14 @@ class PipelineModels:
         sil_score = silhouette_score(df, labels)
         logger.info(f"Coeficiente de silueta obtenido: {sil_score}")
 
-        return kmeans, sil_score
+        # Lista de coeficientes de silueta para cada punto
+        sil_scores = silhouette_samples(df, labels)
+        logger.info(f"Lista de coeficientes de silueta obtenida")
+
+        # Unir los clusters al ID del cliente
+        clusters_df = Utils.join_clusters(cliente_id, labels)
+
+        return kmeans, sil_scores, clusters_df
 
     @staticmethod
     def find_elbow(distortions: list) -> int:
@@ -123,7 +133,7 @@ class PipelineModels:
 
     # 2. Gaussian Mixture Model
     @staticmethod
-    def train_gmm_pd(df: pd.DataFrame, params: Dict[str, Any]) -> Tuple[GaussianMixture, float]:
+    def train_gmm_pd(df: pd.DataFrame, params: Dict[str, Any]) -> Tuple[GaussianMixture, List[float], pd.DataFrame]:
         """
         Entrena un modelo de Gaussian Mixture Model (GMM) y determina el número óptimo de componentes
         utilizando el Criterio de Información Bayesiano (BIC).
@@ -138,7 +148,7 @@ class PipelineModels:
         Returns
         -------
         Tuple[GaussianMixture, float]
-            Modelo GMM entrenado y el puntaje de coeficiente de silueta.
+            Modelo GMM entrenado, lista puntajes de coeficiente de silueta y dataframe con los clusters asignados.
         """
         logger.info("Iniciando el proceso de entrenamiento GMM...")
 
@@ -146,9 +156,8 @@ class PipelineModels:
         gmm_params = params['Gaussian_Mixture_Model']
         exclude_columns = params['no_columns']
 
-        # Excluir columnas no relevantes
-        df = df.drop(columns=exclude_columns)
-        logger.info("Columnas excluidas: %s", exclude_columns)
+        # Preparar los datos
+        df, cliente_id = Utils.prepare_data(df, exclude_columns)
 
         # Encontrar el número óptimo de componentes con el Criterio de Información Bayesiano (BIC)
         optimal_k = PipelineModels.find_optimal_gmm_components(df, gmm_params)
@@ -162,7 +171,14 @@ class PipelineModels:
         sil_score = silhouette_score(df, labels)
         logger.info(f"Coeficiente de silueta obtenido: {sil_score}")
 
-        return gmm, sil_score
+        # Lista de coeficientes de silueta para cada punto
+        sil_scores = silhouette_samples(df, labels)
+        logger.info(f"Lista de coeficientes de silueta obtenida")
+
+        # Unir los clusters al ID del cliente
+        clusters_df = Utils.join_clusters(cliente_id, labels)
+
+        return gmm, sil_scores, clusters_df
 
     @staticmethod
     def find_optimal_gmm_components(df: pd.DataFrame, params: Dict[str, Any]) -> int:
@@ -233,7 +249,7 @@ class PipelineModels:
 
     # 3. DBSCAN
     @staticmethod
-    def train_dbscan_pd(df: pd.DataFrame, params: Dict[str, Any]) -> Tuple[DBSCAN, float]:
+    def train_dbscan_pd(df: pd.DataFrame, params: Dict[str, Any]) -> Tuple[DBSCAN, List[float], pd.DataFrame]:
         """
         Entrena un modelo DBSCAN y calcula el coeficiente de silueta para los datos no considerados como ruido.
 
@@ -247,7 +263,7 @@ class PipelineModels:
         Returns
         -------
         Tuple[DBSCAN, float]
-            Modelo DBSCAN entrenado y el puntaje de coeficiente de silueta.
+            Modelo DBSCAN entrenado, lista puntajes de coeficiente de silueta y dataframe con los clusters asignados.
         """
         logger.info("Iniciando el proceso de entrenamiento DBSCAN...")
 
@@ -255,8 +271,8 @@ class PipelineModels:
         dbscan_params = params['DBSCAN']
         exclude_columns = params['no_columns']
 
-        # Excluir columnas no relevantes
-        df = df.drop(columns=exclude_columns)
+        # Preparar los datos
+        df, cliente_id = Utils.prepare_data(df, exclude_columns)
 
         # Aplicar DBSCAN
         dbscan = DBSCAN(
@@ -281,5 +297,12 @@ class PipelineModels:
             sil_score = -1  # Valor indicativo de que no se pudo calcular el silhouette score
             logger.warning("No se pudo calcular el coeficiente de silueta porque hay un solo cluster.")
 
-        return dbscan, sil_score
+        # Lista de coeficientes de silueta para cada punto
+        sil_scores = silhouette_samples(filtered_data, filtered_labels)
+        logger.info(f"Lista de coeficientes de silueta obtenida")
+
+        # Unir los clusters al ID del cliente
+        clusters_df = Utils.join_clusters(cliente_id, labels)
+
+        return dbscan, sil_scores, clusters_df
 

@@ -11,8 +11,4 @@ primary_data_path: primary_data.parquet
 
 feature_data_path: feature_data.parquet
 
-kmeans_model_data_path: model_kmeans_data.pickle
-
-gmm_model_data_path: model_gmm_data.pickle
-
-dbscan_model_data_path: model_dbscan_data.pickle
+models_data_path: models_data.pickle
