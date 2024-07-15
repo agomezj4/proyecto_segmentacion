@@ -11,26 +11,93 @@ stages:
   - apt-get update -y && apt-get install -y python3 python3-pip python3-venv
   - python3 -m venv proyecto_segmentacion
   - source proyecto_segmentacion/bin/activate
-  - pip3 install --upgrade pip
-  - pip3 install PyYAML==6.0.0
-  - pip3 install pyarrow==16.1.0
-  - pip3 install pandas==2.2.0
+  - pip install --upgrade pip
+  - pip install PyYAML==6.0.0
+  - pip install pyarrow=15.0.0
+  - pip install pandas==2.2.0
 
-# Instalación específica para el stage de raw
+# Instalación específica para el stage raw
 .raw_setup: &raw_setup
   - *common_setup
-  - pip3 install xlsx2csv==0.8.2
-  - pip3 install openpyxl==3.1.0
+  - pip install xlsx2csv==0.8.2
+  - pip install openpyxl==3.1.0
 
+# Instalación específica para el stage feature
+.feature_setup: &feature_setup
+  - *common_setup
+  - pip install scikit-learn==1.5.0
+
+# Instalación específica para el stage models
+.models_setup: &models_setup
+  - *common_setup
+  - pip install numpy==1.26.0
+  - pip install scikit-learn==1.5.0
+
+# Instalación específica para el stage model_selection
+.model_selection_setup: &model_selection_setup
+  - *common_setup
+  - pip install numpy==1.26.0
+  - pip install scikit-learn==1.5.0
+  - pip install bayesian-optimization==1.4.3
 
 ## Ejecución de los stages
-
 raw_pipeline:
   image: python:3.10.0
   stage: raw
   before_script:
-    *raw_setup
+    - *raw_setup
   script:
     - echo "INICIO PIPELINE RAW"
-    - proyecto_segmentacion/bin/python3 __main__.py 'raw_pipeline'
+    - proyecto_segmentacion/bin/python3 __main__.py 'Pipeline Raw'
     - echo "FIN PIPELINE RAW"
+
+intermediate_pipeline:
+    image: python:3.10.0
+    stage: intermediate
+    before_script:
+        - *common_setup
+    script:
+        - echo "INICIO PIPELINE INTERMEDIATE"
+        - proyecto_segmentacion/bin/python3 __main__.py 'Pipeline Intermediate'
+        - echo "FIN PIPELINE INTERMEDIATE"
+
+primary_pipeline:
+    image: python:3.10.0
+    stage: primary
+    before_script:
+        - *common_setup
+    script:
+        - echo "INICIO PIPELINE PRIMARY"
+        - proyecto_segmentacion/bin/python3 __main__.py 'Pipeline Primary'
+        - echo "FIN PIPELINE PRIMARY"
+
+feature_pipeline:
+    image: python:3.10.0
+    stage: feature
+    before_script:
+        - *common_setup
+    script:
+        - echo "INICIO PIPELINE FEATURE"
+        - proyecto_segmentacion/bin/python3 __main__.py 'Pipeline Feature'
+        - echo "FIN PIPELINE FEATURE"
+
+models_pipeline:
+    image: python:3.10.0
+    stage: models
+    before_script:
+        - *common_setup
+    script:
+        - echo "INICIO PIPELINE MODELS"
+        - proyecto_segmentacion/bin/python3 __main__.py 'Pipeline Models'
+        - echo "FIN PIPELINE MODELS"
+
+model_selection_pipeline:
+    image: python:3.10.0
+    stage: model_selection
+    before_script:
+        - *common_setup
+    script:
+        - echo "INICIO PIPELINE MODEL SELECTION"
+        - proyecto_segmentacion/bin/python3 __main__.py 'Pipeline Model Selection'
+        - echo "FIN PIPELINE MODEL SELECTION"
+

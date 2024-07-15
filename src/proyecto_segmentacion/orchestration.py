@@ -5,13 +5,6 @@ logger = Utils.setup_logging()
 Utils.add_src_to_path()
 project_root = Utils.get_project_root()
 
-from .pipelines.raw import PipelineRaw
-from .pipelines.intermediate import PipelineIntermediate
-from .pipelines.primary import PipelinePrimary
-from .pipelines.feature import PipelineFeature
-from .pipelines.models import PipelineModels
-from .pipelines.model_selection import PipelineModelSelection
-
 parameters_directory = os.path.join(project_root, 'src', 'parameters')
 data_raw_directory = os.path.join(project_root, 'data', '01_raw')
 data_intermediate_directory = os.path.join(project_root, 'data', '02_intermediate')
@@ -28,6 +21,8 @@ class PipelineOrchestration:
     # 1. Pipeline Raw
     @staticmethod
     def run_pipeline_raw():
+        from .pipelines.raw import PipelineRaw
+
         tag_dict_path = os.path.join(data_raw_directory, parameters['parameters_catalog']['tag_dict_path'])
         customers_data_path = os.path.join(data_raw_directory, parameters['parameters_catalog']['data_customers_path'])
 
@@ -43,6 +38,8 @@ class PipelineOrchestration:
     # 2. Pipeline Intermediate
     @staticmethod
     def run_pipeline_intermediate():
+        from .pipelines.intermediate import PipelineIntermediate
+
         raw_data_path = os.path.join(data_raw_directory, parameters['parameters_catalog']['raw_data_path'])
         tag_dict_path = os.path.join(data_raw_directory, parameters['parameters_catalog']['tag_dict_path'])
 
@@ -61,6 +58,8 @@ class PipelineOrchestration:
     # 3. Pipeline Primary
     @staticmethod
     def run_pipeline_primary():
+        from .pipelines.primary import PipelinePrimary
+
         intermediate_data_path = os.path.join(
             data_intermediate_directory,
             parameters['parameters_catalog']['intermediate_data_path'])
@@ -85,6 +84,8 @@ class PipelineOrchestration:
     # 4. Pipeline Feature
     @staticmethod
     def run_pipeline_feature():
+        from .pipelines.feature import PipelineFeature
+
         primary_data_path = os.path.join(
             data_primary_directory,
             parameters['parameters_catalog']['primary_data_path'])
@@ -106,6 +107,8 @@ class PipelineOrchestration:
     # 5. Pipeline Models
     @staticmethod
     def run_pipeline_models():
+        from .pipelines.models import PipelineModels
+
         feature_data_path = os.path.join(
             data_feature_directory,
             parameters['parameters_catalog']['feature_data_path'])
@@ -129,6 +132,8 @@ class PipelineOrchestration:
     # 6. Pipeline Model Selection
     @staticmethod
     def run_pipeline_model_selection():
+        from .pipelines.model_selection import PipelineModelSelection
+
         models_data_path = os.path.join(data_models_directory,
                                         parameters['parameters_catalog']['models_data_path'])
 

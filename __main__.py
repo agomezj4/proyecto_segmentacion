@@ -37,7 +37,7 @@ def main():
         else:
             print(f"Pipeline '{pipeline}' no reconocido.")
     else:
-        print("No se especificó un pipeline. Uso: python -m src.proyecto_segmentacion [pipeline]")
+        print("No se especificó un pipeline. Uso: python __main__.py [pipeline]")
 
 
 if __name__ == "__main__":
