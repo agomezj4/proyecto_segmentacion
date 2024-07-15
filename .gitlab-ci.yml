@@ -22,6 +22,12 @@ stages:
   - pip install xlsx2csv==0.8.2
   - pip install openpyxl==3.1.0
 
+# Instalación específica para el stage intermediate
+.intermediate_setup: &intermediate_setup
+  - *common_setup
+  - pip install xlsx2csv==0.8.2
+  - pip install openpyxl==3.1.0
+
 # Instalación específica para el stage feature
 .feature_setup: &feature_setup
   - *common_setup
