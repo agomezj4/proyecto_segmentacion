@@ -10,6 +10,7 @@ from .pipelines.intermediate import PipelineIntermediate
 from .pipelines.primary import PipelinePrimary
 from .pipelines.feature import PipelineFeature
 from .pipelines.models import PipelineModels
+from .pipelines.model_selection import PipelineModelSelection
 
 parameters_directory = os.path.join(project_root, 'src', 'parameters')
 data_raw_directory = os.path.join(project_root, 'data', '01_raw')
@@ -17,6 +18,7 @@ data_intermediate_directory = os.path.join(project_root, 'data', '02_intermediat
 data_primary_directory = os.path.join(project_root, 'data', '03_primary')
 data_feature_directory = os.path.join(project_root, 'data', '04_feature')
 data_models_directory = os.path.join(project_root, 'data', '05_models')
+data_model_selection_directory = os.path.join(project_root, 'data', '06_model_selection')
 
 parameters = Utils.load_parameters(parameters_directory)
 
@@ -123,4 +125,28 @@ class PipelineOrchestration:
                                         parameters['parameters_catalog']['models_data_path'])
 
         Utils.save_pickle([data_kmeans, data_gmm, data_dbscan], models_data_path)
+
+    # 6. Pipeline Model Selection
+    @staticmethod
+    def run_pipeline_model_selection():
+        models_data_path = os.path.join(data_models_directory,
+                                        parameters['parameters_catalog']['models_data_path'])
+
+        data_models = Utils.load_pickle(models_data_path)
+
+        feature_data_path = os.path.join(data_feature_directory,
+                                         parameters['parameters_catalog']['feature_data_path'])
+
+        data_feature = Utils.load_data(feature_data_path)
+
+        data_select_best_model = PipelineModelSelection.select_best_model_pd(data_models,
+                                                                             parameters['parameters_model_selection'])
+
+        data_model_selection = PipelineModelSelection.optimize_train_best_gmm_pd(data_feature,
+                                                                                 parameters['parameters_model_selection'])
+
+        model_selection_data_path = os.path.join(data_model_selection_directory,
+                                                 parameters['parameters_catalog']['model_selection_data_path'])
+
+        Utils.save_pickle(data_model_selection, model_selection_data_path)
 

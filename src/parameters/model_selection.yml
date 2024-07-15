@@ -14,12 +14,12 @@ DBSCAN:
 
 Gaussian_Mixture_Model:
   exploration_space:
-    n_components: [1, 8]  # Rango para el número de componentes
+    n_components: [1, 10]  # Rango para el número de componentes
     covariance_type: ["full", "tied", "diag", "spherical"]  # Tipos de covarianza
-    tol: [0.0001, 0.1]  # Rango para la tolerancia
+    tol: [0.0001, 0.08]  # Rango para la tolerancia
   max_iter: 100  # Número máximo de iteraciones
   n_init: 10  # Número de inicializaciones
-  init_params: "kmeans"  # Método de inicialización
+  init_params: "random"  # Método de inicialización
   warm_start: False  # Si se debe usar warm start
   verbose: 0  # Nivel de verbosidad
   verbose_interval: 10  # Intervalo de verbosidad

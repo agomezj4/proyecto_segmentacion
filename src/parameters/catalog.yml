@@ -12,3 +12,5 @@ primary_data_path: primary_data.parquet
 feature_data_path: feature_data.parquet
 
 models_data_path: models_data.pickle
+
+model_selection_data_path: model_selection_data.pickle
