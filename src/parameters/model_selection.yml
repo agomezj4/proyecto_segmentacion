@@ -5,7 +5,7 @@ threshold_significance: 0.05
 DBSCAN:
   exploration_space:
     eps: [0.1, 10.0]  # Rango para eps
-    min_samples: [1, 10]  # Rango para min_samples
+    min_samples: [1, 11]  # Rango para min_samples
     leaf_size: [20, 50]  # Rango para leaf_size
   metric: "euclidean"  # Métrica para DBSCAN
   algorithm: "auto"  # Algoritmo para DBSCAN
