@@ -1,6 +1,6 @@
 import sys
-from .utils import Utils
-from .orchestration import PipelineOrchestration
+from src.proyecto_segmentacion.utils import Utils
+from src.proyecto_segmentacion.orchestration import PipelineOrchestration
 
 Utils.add_src_to_path()
 
