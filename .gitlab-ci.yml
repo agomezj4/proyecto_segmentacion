@@ -13,7 +13,7 @@ stages:
   - source proyecto_segmentacion/bin/activate
   - pip install --upgrade pip
   - pip install PyYAML==6.0.0
-  - pip install pyarrow=15.0.0
+  - pip install pyarrow==15.0.0
   - pip install pandas==2.2.0
 
 # Instalación específica para el stage raw
