@@ -10,7 +10,7 @@ stages:
 .common_setup: &common_setup
   - apt-get update -y && apt-get install -y python3 python3-pip python3-venv
   - python3 -m venv proyecto_segmentacion
-  - source proyecto_segmentacion/bin/activate
+  - . proyecto_segmentacion/bin/activate
   - pip install --upgrade pip
   - pip install PyYAML==6.0.0
   - pip install pyarrow==15.0.0
@@ -54,6 +54,7 @@ raw_pipeline:
     - *raw_setup
   script:
     - echo "INICIO PIPELINE RAW"
+    - . proyecto_segmentacion/bin/activate
     - proyecto_segmentacion/bin/python3 __main__.py 'Pipeline Raw'
     - echo "FIN PIPELINE RAW"
 
@@ -61,9 +62,10 @@ intermediate_pipeline:
     image: python:3.10.0
     stage: intermediate
     before_script:
-        - *common_setup
+        - *intermediate_setup
     script:
         - echo "INICIO PIPELINE INTERMEDIATE"
+        - . proyecto_segmentacion/bin/activate
         - proyecto_segmentacion/bin/python3 __main__.py 'Pipeline Intermediate'
         - echo "FIN PIPELINE INTERMEDIATE"
 
@@ -74,6 +76,7 @@ primary_pipeline:
         - *common_setup
     script:
         - echo "INICIO PIPELINE PRIMARY"
+        - . proyecto_segmentacion/bin/activate
         - proyecto_segmentacion/bin/python3 __main__.py 'Pipeline Primary'
         - echo "FIN PIPELINE PRIMARY"
 
@@ -81,9 +84,10 @@ feature_pipeline:
     image: python:3.10.0
     stage: feature
     before_script:
-        - *common_setup
+        - *feature_setup
     script:
         - echo "INICIO PIPELINE FEATURE"
+        - . proyecto_segmentacion/bin/activate
         - proyecto_segmentacion/bin/python3 __main__.py 'Pipeline Feature'
         - echo "FIN PIPELINE FEATURE"
 
@@ -91,9 +95,10 @@ models_pipeline:
     image: python:3.10.0
     stage: models
     before_script:
-        - *common_setup
+        - *models_setup
     script:
         - echo "INICIO PIPELINE MODELS"
+        - . proyecto_segmentacion/bin/activate
         - proyecto_segmentacion/bin/python3 __main__.py 'Pipeline Models'
         - echo "FIN PIPELINE MODELS"
 
@@ -101,9 +106,9 @@ model_selection_pipeline:
     image: python:3.10.0
     stage: model_selection
     before_script:
-        - *common_setup
+        - *model_selection_setup
     script:
         - echo "INICIO PIPELINE MODEL SELECTION"
+        - . proyecto_segmentacion/bin/activate
         - proyecto_segmentacion/bin/python3 __main__.py 'Pipeline Model Selection'
         - echo "FIN PIPELINE MODEL SELECTION"
-
